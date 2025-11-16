@@ -1,0 +1,6 @@
+QUARTUS_VERSION = "23.1"
+DATE = "12:00:00  November 14, 2025"
+
+# Revisions
+
+PROJECT_REVISION = "RS232_Communication"
