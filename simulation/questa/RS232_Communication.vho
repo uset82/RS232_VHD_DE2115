@@ -17,7 +17,7 @@
 -- PROGRAM "Quartus Prime"
 -- VERSION "Version 24.1std.0 Build 1077 03/04/2025 SC Lite Edition"
 
--- DATE "11/16/2025 09:52:58"
+-- DATE "11/16/2025 16:30:22"
 
 -- 
 -- Device: Altera EP4CE115F29C7 Package FBGA780
@@ -866,11 +866,11 @@ SIGNAL \display_inst|data_latched\ : std_logic_vector(7 DOWNTO 0);
 SIGNAL \receiver_inst|baud_counter\ : std_logic_vector(15 DOWNTO 0);
 SIGNAL \receiver_inst|bit_counter\ : std_logic_vector(2 DOWNTO 0);
 SIGNAL \sender_inst|data_shift_reg\ : std_logic_vector(7 DOWNTO 0);
-SIGNAL \ALT_INV_SW[17]~input_o\ : std_logic;
-SIGNAL \display_inst|rom_7seg_ones|ALT_INV_Mux0~0_combout\ : std_logic;
-SIGNAL \display_inst|rom_7seg_tens|ALT_INV_Mux0~0_combout\ : std_logic;
 SIGNAL \receiver_inst|ALT_INV_state.IDLE~q\ : std_logic;
 SIGNAL \sender_inst|ALT_INV_dataOut~q\ : std_logic;
+SIGNAL \display_inst|rom_7seg_ones|ALT_INV_Mux0~0_combout\ : std_logic;
+SIGNAL \display_inst|rom_7seg_tens|ALT_INV_Mux0~0_combout\ : std_logic;
+SIGNAL \ALT_INV_SW[17]~input_o\ : std_logic;
 
 COMPONENT hard_block
     PORT (
@@ -900,11 +900,11 @@ ww_devclrn <= devclrn;
 ww_devpor <= devpor;
 
 \CLOCK_50~inputclkctrl_INCLK_bus\ <= (vcc & vcc & vcc & \CLOCK_50~input_o\);
-\ALT_INV_SW[17]~input_o\ <= NOT \SW[17]~input_o\;
-\display_inst|rom_7seg_ones|ALT_INV_Mux0~0_combout\ <= NOT \display_inst|rom_7seg_ones|Mux0~0_combout\;
-\display_inst|rom_7seg_tens|ALT_INV_Mux0~0_combout\ <= NOT \display_inst|rom_7seg_tens|Mux0~0_combout\;
 \receiver_inst|ALT_INV_state.IDLE~q\ <= NOT \receiver_inst|state.IDLE~q\;
 \sender_inst|ALT_INV_dataOut~q\ <= NOT \sender_inst|dataOut~q\;
+\display_inst|rom_7seg_ones|ALT_INV_Mux0~0_combout\ <= NOT \display_inst|rom_7seg_ones|Mux0~0_combout\;
+\display_inst|rom_7seg_tens|ALT_INV_Mux0~0_combout\ <= NOT \display_inst|rom_7seg_tens|Mux0~0_combout\;
+\ALT_INV_SW[17]~input_o\ <= NOT \SW[17]~input_o\;
 auto_generated_inst : hard_block
 PORT MAP (
 	devoe => ww_devoe,

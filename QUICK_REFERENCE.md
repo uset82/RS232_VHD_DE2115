@@ -42,10 +42,10 @@ Board 1: GND             ←→ Board 2: GND
 |--------|----------|--------|
 | SW[17] | Mode Select | 0=Sender, 1=Receiver |
 | SW[16:14] | Baud Rate | See table below |
-| SW[13:12] | Data Source | 00=Fixed (min requirement), 01=SW, 10/11=Reserved |
+| SW[13:12] | Data Source | 00=Fixed (min requirement), 01=SW, 10/11=Not used |
 | SW[7:0] | Data Input | 8-bit value (when SW[13:12]=01) |
 
-> **Minimum hand-in reminder:** For the graded baseline, leave SW[13:12]=00 (hardcoded byte) or 01 (switch input) and verify the received value on LEDR[7:0]. Other settings are reserved for future expansion.
+> **Minimum hand-in reminder:** For the graded baseline, leave SW[13:12]=00 (hardcoded byte) or 01 (switch input) and verify the received value on LEDR[7:0]. Settings 10 and 11 are disabled in this build to avoid confusion.
 
 ### Baud Rate Selection (SW[16:14])
 

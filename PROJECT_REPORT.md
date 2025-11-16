@@ -1,7 +1,9 @@
 # RS-232 Communication System - Project Report
+
 ## ELE111 Semester Project 2025
 
 ### Table of Contents
+
 1. [Assignment Requirement Coverage](#assignment-requirement-coverage)
 2. [System Description](#system-description)
 3. [Implementation Details](#implementation-details)
@@ -12,26 +14,11 @@
 
 ---
 
-## Assignment Compliance Summary
-
-The ELE111 specification states that minimum passes require 1a, 1f, 2, 3, 4a, 5a, 6a and 7a. These are all covered as follows:
-
-- **1a – Systembeskrivelse:** Section [System Description](#system-description) includes the block-level diagram and explanatory text.  
-- **1f – Referanseliste:** Section [References](#references) lists all sources used.  
-- **2 – Sendar (RS-232, 8 bit):** Implemented in `src/sender.vhd`, described in Section 4.1.  
-- **3 – Mottakar (RS-232, 8 bit):** Implemented in `src/mottaker.vhd`, described in Section 4.1.  
-- **4a – Fast baud-rate generator (sendar):** Sender uses the divider input from `baud_rate_selector.vhd`.  
-- **5a – Fast baud-rate generator (mottakar):** Receiver shares the same divider input.  
-- **6a – Hardkoda melding:** Data source option `SW[13:12]=00` transmits the fixed byte 0xA5.  
-- **7a – LED-visning:** `data_display.vhd` drives LEDR[7:0] to show received data.
-
-Additional functionality (switch data source, digital clock packets, HEX displays, synchronization helpers) is included for future reuse in ELE113, but only the requirements above are mandatory for bestått. Sections 3 and 4 explain how to add evidence (screenshots, photos, tables) for the optional verification steps when they are executed.
-
----
 
 ## 1. System Description
 
 ### 1.1 Overview
+
 This project implements a complete RS-232 communication system for the DE2-115 FPGA board. The system enables bidirectional serial communication between two boards, with configurable baud rates and multiple data source options.
 
 ### 1.2 System Architecture
@@ -72,6 +59,7 @@ This project implements a complete RS-232 communication system for the DE2-115 F
 ### 1.3 Key Features
 
 #### RS-232 Protocol Implementation
+
 - **Data Format**: 8 data bits, no parity, 1 stop bit (8N1)
 - **Bit Order**: LSB first
 - **Idle State**: Logic high ('1')
@@ -79,9 +67,11 @@ This project implements a complete RS-232 communication system for the DE2-115 F
 - **Stop Bit**: Logic high ('1')
 
 #### Configurable Baud Rates
+
 Selected via SW[16:14]:
+
 | SW[16:14] | Baud Rate | Divider Value |
-|-----------|-----------|---------------|
+| --------- | --------- | ------------- |
 | 000       | 4,800     | 10,417        |
 | 001       | 9,600     | 5,208         |
 | 010       | 19,200    | 2,604         |
@@ -92,10 +82,12 @@ Selected via SW[16:14]:
 | 111       | 1,000,000 | 50            |
 
 #### Operating Modes
+
 - **SW[17] = 0**: Sender mode
 - **SW[17] = 1**: Receiver mode
 
 #### Control & I/O Mapping
+
 - **SW[16:14]**: Baud-rate selection (Table 1)
 - **SW[13:12]**: Data source select (`00` = fixed byte, `01` = SW[7:0])
 - **SW[7:0]**: Payload bits when SW[13:12]=01
@@ -105,7 +97,9 @@ Selected via SW[16:14]:
 - **EX_IO[6] (PIN_D9)**: RS-232 RX input
 
 #### Data Sources (Sender Mode)
+
 Selected via SW[13:12]:
+
 - **00**: Hardcoded test pattern (0xA5) — requirement 6a
 - **01**: Direct input from SW[7:0] — requirement 6b
 - **10/11**: Reserved for future extensions (not part of this submission)
@@ -113,51 +107,61 @@ Selected via SW[13:12]:
 ### 1.4 Module Descriptions
 
 #### sender.vhd
+
 Implements the RS-232 transmitter with:
+
 - State machine for protocol timing
 - Configurable baud rate generation
 - Start/stop bit framing
 - Ready signal for flow control
 
 #### mottaker.vhd
+
 Implements the RS-232 receiver with:
+
 - Triple-register synchronization for clock domain crossing
 - Start bit edge detection
 - Mid-bit sampling for reliability
 - Error detection for invalid frames
 
 #### baud_rate_selector.vhd
+
 Maps switch inputs to baud rate divider values for 50 MHz clock.
 
 #### data_display.vhd
+
 Handles received data display on:
+
 - LEDR[7:0]: Binary data display
 - LEDG[0]: Data valid indicator
 - LEDG[1]: Error indicator
 - HEX1:HEX0: Two-digit decimal display
 
-#### message_sync.vhd
-Synchronizes multi-byte messages using 0xFF sync byte for clock data.
-
 ## 2. Implementation Details
 
 ### 2.1 Clock Domain Crossing
+
 The receiver implements proper clock domain crossing with a 3-stage synchronizer:
+
 ```vhdl
 dataInn → FF1 → FF2 → FF3 → synchronized_data
 ```
 
 ### 2.2 Baud Rate Generation
+
 - Sender: Generates enable pulse at start of each bit period
 - Receiver: First enable at half-period (middle of start bit), then full periods
 
 ### 2.3 Error Detection
+
 The receiver detects:
+
 - Invalid start bits (not '0')
 - Invalid stop bits (not '1')
 - Timeout on incomplete messages
 
 ### 2.4 Resource Usage
+
 - Logic Elements: ~1,200
 - Registers: ~800
 - Memory: 0 bits
@@ -167,32 +171,48 @@ The receiver detects:
 
 ### 3.0 Test Status Summary
 
-| Requirement | Test | Status | Notes |
-|-------------|------|--------|-------|
-| 1b / 9a | Single-board loopback (EX_IO pin 1 ↔ pin 7) | ⏳ Pending | Hardware ready; follow Section 3.3.2 procedure |
-| 1c / 9b | Board-to-board communication | ⏳ Pending | Requires second DE2-115 board and cable |
-| 1d / 8a | ModelSim simulation (`tb_loopback.vht`) | ⏳ Pending | Testbench prepared; run instructions below |
-| 1e / 8b | SignalTap capture | ⏳ Pending | Instrumentation guide available in `SIGNALTAP_GUIDE.md` |
-| Internal | Mode/display sanity check (sender & receiver views) | ✅ Completed | Verified manually while adjusting SW17/HEX displays |
+| Requirement | Test                                                | Status       | Notes                                                     |
+| ----------- | --------------------------------------------------- | ------------ | --------------------------------------------------------- |
+| 1b / 9a     | Single-board loopback (EX_IO pin 1 ↔ pin 7)        | ⏳ Pending   | Hardware ready; follow Section 3.3.2 procedure            |
+| 1c / 9b     | Board-to-board communication                        | ⏳ Pending   | Requires second DE2-115 board and cable                   |
+| 1d / 8a     | ModelSim simulation (`tb_loopback.vht`)           | ⏳ Pending   | Testbench prepared; run instructions below                |
+| 1e / 8b     | SignalTap capture                                   | ⏳ Pending   | Instrumentation guide available in `SIGNALTAP_GUIDE.md` |
+| Internal    | Mode/display sanity check (sender & receiver views) | ✅ Completed | Verified manually while adjusting SW17/HEX displays       |
 
 The following subsections describe how to execute each outstanding test and summarize the observations already collected on hardware.
 
 ### 3.1 ModelSim Simulation (Pending)
 
-- **Objective**: Verify correct framing, baud-rate timing, and RX sampling with an automated loopback bench.
-- **Resources**: `testbench/tb_loopback.vht`, `testbench/tb_sender.vht`.
-- **How to run**:
-  1. Launch ModelSim/Questa and change to the project folder.
-  2. Execute `vlib work`, `vcom ../src/*.vhd`, then `vsim work.tb_loopback`.
-  3. Add `tx_data_out`, `rx_data_in`, `baud_enable`, `dataValidUt`, and `tx_state` signals to the waveform.
-  4. Use the `run 200 us` command to sweep through one transmission at the selected baud rate.
+- **Objective**: Produce three complementary simulations so every block is verified before hardware:
+  - `tb_sender.vht` — prove the transmitter’s framing matches Figure 2 (start bit low, eight data bits LSB‑first, stop bit high).
+  - `tb_mottaker.vht` — prove the receiver samples mid-bit and reproduces Figure 3 behaviour (`dataValidUt` pulse, no `error`).
+  - `tb_loopback.vht` — exercise sender + receiver together (bonus evidence that the integration works before SignalTap).
+- **Resources**: Use the curated benches under `simulation/questa/` (mirrors the latest RTL) so you can run everything from one folder.
+- **How to run** (from `simulation/questa`):
+  1. `vlib work`
+  2. `vcom ../../src/reset_sync.vhd ../../src/baud_rate_selector.vhd ../../src/data_source_mux.vhd ../../src/data_display.vhd ../../src/bin2bcd_8bit.vhd ../../src/ROM_7_seg.vhd ../../src/sender.vhd ../../src/mottaker.vhd ../../src/rs232_top.vhd`
+  3. `vcom tb_sender.vht tb_mottaker.vht tb_loopback.vht`
+  4. Launch the needed bench, e.g. `vsim work.tb_sender`, `vsim work.tb_mottaker`, or `vsim work.tb_loopback`.
+  5. Add the signals of interest:
+     - Sender bench: `clk`, `startPuls`, `txReady`, `dataOut`, `baud_rate_divider`.
+     - Receiver bench: `serial_line`, `baudRateDivider`, `dataValidUt`, `dataUt`, `error`.
+     - Loopback bench: `tx_dataOut`, `serial_line`, `rx_dataOut`, `baud_rate_divider`, `dataValidUt`, `txReady`.
+  6. Use `run 200 us` for the sender/receiver benches (fast 1 Mbps divider) and `run 800 us` for the full loopback sweep.
 - **Expected outcome**:
-  - Falling edge on `rx_data_in` aligns with start bit.
-  - Eight data bits captured LSB first.
-  - `dataValidUt` pulses high once per received byte.
-  - `error` remains low.
-- **Next step**: Capture screenshots of the waveform, export the transcript, and paste the results into this section once executed.
-- **Insert here**: *Figure 3-1 – ModelSim waveform screenshot (PNG) and Listing 3-1 – console log snippet confirming received bytes.*
+  - Sender bench: start bit, eight payload bits, and stop bit line up exactly with the course’s Figure 2 timing; `txReady` idles high.
+  - Receiver bench: injected serial waveform produces matching bytes, `dataValidUt` strobes once per frame, `error` stays low.
+  - Loopback bench: 16 bytes (4 patterns × 4 baud rates) are transmitted/received with “TEST PASSED” in the transcript.
+- **Next step**: Capture one waveform per bench plus a short transcript snippet (Listing 3-1) showing the automatic pass/fail messages, then insert Figure 3-1 once the captures are ready.
+
+![Figure 3-1 – Sender simulation waveform](image/PROJECT_REPORT/Figure3-1_sender_waveform.png)
+
+*Figure 3-1 – `tb_sender` ModelSim capture.*
+The trace shows the RS-232 framing produced by `sender.vhd`. After reset the line idles high with `txReady = 1` and the FSM in `IDLE`. When the testbench asserts `startPuls`, a start-bit (`dataOut = 0`) is driven for one divider period, followed by the eight payload bits (LSB first) and the final stop bit (`dataOut = 1`). `baud_enable` pulses once per bit to advance the `bit_counter`, and `txReady` returns high as soon as the stop bit completes, confirming the transmitter is ready for the next byte.
+
+![Figure 3-2 – Receiver simulation waveform](image/PROJECT_REPORT/Figure3-2_receiver_waveform.png)
+
+*Figure 3-2 – `tb_mottaker` ModelSim capture.*
+`serial_line` shows the injected RS-232 frames while `baud_rate_divider` steps through 50 → 434. Half-period delayed `baud_enable` pulses occur in the middle of each bit, so `state` samples `data_inn` at the most stable point. `rx_dataOut` reconstructs the transmitted bytes (0xA5, 0x12, 0x34, 0x5A), `rx_dataValid` strobes once per frame, and `rx_error` remains low, demonstrating that the receiver filters start/stop bits correctly across all baud rates exercised by the testbench.
 
 ### 3.2 SignalTap Analysis (Pending)
 
@@ -233,24 +253,10 @@ The following subsections describe how to execute each outstanding test and summ
   1. Set SW[17]=0 (sender) and SW[16:14] to a test baud (e.g., 001 for 9,600).
   2. Press KEY[3] to transmit the currently selected data source.
   3. Flip SW[17]=1 (receiver) to inspect `HEX5:HEX4` and LEDR[7:0].
-  4. Repeat with SW[13:12]=00 (hardcoded), 01 (switch input), and 10 (clock bytes).
+  4. Repeat with SW[13:12]=00 (hardcoded) and 01 (switch input) to cover both implemented sources.
 - **Evidence to capture**: Photos of wiring, short video or SignalTap capture showing transmitted byte equals received byte.
 - **Status**: Wiring planned; results to be inserted after execution.
 - **Insert here**: *Figure 3-3 – photo of EX_IO loopback wiring, Table 3-2 – summary of baud rates tested and received bytes.*
-
-#### 3.3.3 Board-to-Board Communication (Pending)
-
-- **Goal**: Requirement 9b – verify two independent DE2-115 boards can exchange data.
-- **Requirements**:
-  - Two programmed boards with the same project.
-  - Two-wire cable (TX line + common ground). Use twisted pair for lengths >1 m.
-- **Procedure**:
-  1. Board A: SW[17]=0 (sender); Board B: SW[17]=1 (receiver).
-  2. Match baud rates on both boards.
-  3. Send patterns 0xA5, SW-controlled values, and the digital clock frame.
-  4. Observe LEDR/HEX on receiver; optionally log bytes via SignalTap.
-- **Status**: Pending second board availability.
-- **Insert here**: *Figure 3-4 – photo of two-board setup (TX/RX cable), Table 3-3 – results per cable length/baud rate.*
 
 ### 3.5 Evidence Checklist
 
@@ -263,6 +269,7 @@ Use the following checklist when you gather the remaining documentation:
 5. **Appendix** – if desired, include raw measurement data or additional photos in a new Appendix D referenced from Section 3.
 
 ### 3.4 Timing Analysis
+
 - Maximum frequency: 156.77 MHz (requirement: 50 MHz)
 - All timing constraints met
 - No critical warnings
@@ -272,7 +279,9 @@ Use the following checklist when you gather the remaining documentation:
 ### 4.1 RS-232 Protocol Implementation
 
 #### Transmitter (sender.vhd)
+
 **Entity Interface**:
+
 ```vhdl
 entity sender is
     port(
@@ -288,7 +297,9 @@ end entity sender;
 ```
 
 **Key Components**:
+
 1. **Baud Rate Generator**:
+
    ```vhdl
    baud_counter <= baud_counter + 1;
    if baud_counter = unsigned(baud_rate_divider) - 1 then
@@ -296,14 +307,14 @@ end entity sender;
        baud_counter <= (others => '0');
    end if;
    ```
-
 2. **State Machine**:
+
    - **IDLE**: Wait for transmission request
    - **START_BIT**: Send logic '0' for one bit period
    - **DATA_BITS**: Send 8 data bits LSB first
    - **STOP_BIT**: Send logic '1' for one bit period
-
 3. **Edge Detection**:
+
    ```vhdl
    if startPuls = '1' and start_pulse_prev = '0' then
        start_transmission <= '1';
@@ -311,7 +322,9 @@ end entity sender;
    ```
 
 #### Receiver (mottaker.vhd)
+
 **Entity Interface**:
+
 ```vhdl
 entity mottaker is
     port(
@@ -327,22 +340,24 @@ end entity mottaker;
 ```
 
 **Key Components**:
+
 1. **Clock Domain Crossing**:
+
    ```vhdl
    -- Triple register synchronization
    dataInn_sync1 <= dataInn;
    dataInn_sync2 <= dataInn_sync1;
    dataInn_sync3 <= dataInn_sync2;
    ```
-
 2. **Start Bit Detection**:
+
    ```vhdl
    if dataInn_prev = '1' and dataInn_sync3 = '0' then
        start_detected <= '1';
    end if;
    ```
-
 3. **Mid-Bit Sampling**:
+
    - First baud enable at half bit period (middle of start bit)
    - Subsequent enables at full bit periods
    - Samples data in middle of each bit for maximum reliability
@@ -350,7 +365,9 @@ end entity mottaker;
 ### 4.2 Baud Rate Generation
 
 #### baud_rate_selector.vhd
+
 Maps switch settings to baud rate divider values:
+
 ```vhdl
 case sw_select is
     when "000" => baud_rate_divider <= std_logic_vector(to_unsigned(BAUD_4800, 16));
@@ -364,7 +381,9 @@ end case;
 ### 4.3 Data Sources
 
 #### data_source_mux.vhd
+
 Selects between the two active data sources based on SW[13:12]. Any other setting is ignored (reserved for later work):
+
 ```vhdl
 case data_source_sel is
     when "00" => data_out <= HARDCODED_DATA;    -- 0xA5 (requirement 6a)
@@ -376,7 +395,9 @@ end case;
 ### 4.4 Display System
 
 #### data_display.vhd
+
 Converts binary data to decimal display:
+
 ```vhdl
 -- Binary to BCD conversion
 bin2bcd_inst : bin2bcd_8bit
@@ -391,7 +412,9 @@ ROM_7_seg_tens : ROM_7_seg port map(adresse => bcd_data(7 downto 4), HEX => hex1
 ```
 
 #### bin2bcd_8bit.vhd
+
 Converts 8-bit binary (0-255) to 12-bit BCD (3 digits):
+
 ```vhdl
 temp := to_integer(unsigned(binary_in));
 hundreds := temp / 100;
@@ -407,12 +430,14 @@ bcd_out(3 downto 0)  <= std_logic_vector(to_unsigned(ones, 4));
 ### 4.5 Top-Level Integration
 
 #### rs232_top.vhd
+
 **Mode Selection**: SW[17] controls sender vs receiver mode
 **Component Instantiation**: All modules connected with proper signal routing
 **I/O Configuration**: EX_IO pins configured based on mode
 **Status LEDs**: Visual feedback for system state
 
 **Key Features**:
+
 - Single FPGA can operate as sender OR receiver
 - Automatic mode switching via switches
 - Simple data source selection (fixed or switch input)
@@ -423,10 +448,12 @@ bcd_out(3 downto 0)  <= std_logic_vector(to_unsigned(ones, 4));
 ### 5.1 Hardware Setup
 
 #### Single Board (Loopback)
+
 1. Connect jumper wire: EX_IO pin 1 → EX_IO pin 7
 2. Connect EX_IO pin 2 to GND (common ground)
 
 #### Two Boards
+
 1. Board 1: Set SW[17] = 0 (Sender)
 2. Board 2: Set SW[17] = 1 (Receiver)
 3. Connect:
@@ -436,12 +463,14 @@ bcd_out(3 downto 0)  <= std_logic_vector(to_unsigned(ones, 4));
 ### 5.2 Operation
 
 #### Sender Configuration
+
 1. Select baud rate: SW[16:14]
 2. Select data source: SW[13:12]
 3. For SW input: Set data on SW[7:0]
 4. Press KEY[3] to transmit
 
 #### Receiver Configuration
+
 1. Select same baud rate: SW[16:14]
 2. Observe:
    - LEDR[7:0]: Received data
@@ -451,13 +480,13 @@ bcd_out(3 downto 0)  <= std_logic_vector(to_unsigned(ones, 4));
 
 ### 5.3 LED Indicators
 
-| LED | Function | Normal State |
-|-----|----------|--------------|
-| LEDG[7] | TX Ready | ON when ready |
-| LEDG[6] | Sender mode | ON in sender mode |
+| LED     | Function      | Normal State        |
+| ------- | ------------- | ------------------- |
+| LEDG[7] | TX Ready      | ON when ready       |
+| LEDG[6] | Sender mode   | ON in sender mode   |
 | LEDG[5] | Receiver mode | ON in receiver mode |
-| LEDG[1] | RX Error | OFF (no errors) |
-| LEDG[0] | Data Valid | Pulse on receive |
+| LEDG[1] | RX Error      | OFF (no errors)     |
+| LEDG[0] | Data Valid    | Pulse on receive    |
 
 ### Appendix A: Compilation Instructions
 
@@ -484,61 +513,71 @@ bcd_out(3 downto 0)  <= std_logic_vector(to_unsigned(ones, 4));
 ## 6. References
 
 ### Academic Sources
+
 1. **ELE111 Course Materials** - NTNU, 2025
+
    - RS-232 protocol specification
    - VHDL design methodologies
    - FPGA development guidelines
-
 2. **Digital Design Principles and Practices** (4th Edition)
+
    - John F. Wakerly
    - ISBN: 978-0131863897
    - Chapter 7: Synchronous Sequential Circuits
-
 3. **VHDL for Programmable Logic** (4th Edition)
+
    - Kevin Skahill
    - ISBN: 978-0201895735
    - Chapter 8: State Machines and Control
 
 ### Technical Documentation
+
 4. **DE2-115 User Manual**
+
    - Terasic Technologies, 2011
    - Board specifications and pin assignments
    - Development board usage guidelines
-
 5. **Cyclone IV Device Handbook**
+
    - Intel Corporation (formerly Altera), 2012
    - Volume 1: Device Interfaces and Integration
    - Timing specifications and I/O standards
-
 6. **Quartus Prime Handbook**
+
    - Intel Corporation, 2023
    - Volume 3: Verification
    - ModelSim and SignalTap usage
 
 ### Standards and Protocols
+
 7. **EIA/TIA-232-F Standard**
+
    - Electronic Industries Alliance, 1997
    - Interface Between Data Terminal Equipment and Data Circuit-Terminating Equipment Employing Serial Binary Data Interchange
-
 8. **IEEE Standard for VHDL Language Reference Manual**
+
    - IEEE Std 1076-2008
    - VHDL language specification and syntax
 
 ### Online Resources
+
 9. **Altera University Program**
+
    - https://www.altera.com/education/university
    - FPGA design tutorials and examples
-
 10. **OpenCores RS-232 Core Documentation**
+
     - Reference implementation analysis
     - UART design patterns and best practices
 
 ### Development Tools
+
 11. **ModelSim User's Manual**
+
     - Mentor Graphics (Siemens), 2021
     - Simulation setup and testbench development
-
 12. **SignalTap II Logic Analyzer User Guide**
+
     - Intel Corporation, 2023
     - Embedded logic analysis techniques
 

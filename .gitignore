@@ -1,0 +1,10 @@
+# Quartus lock files
+*.flock
+*.rdr.flock
+*.qws
+
+# Simulation files
+simulation/questa/*.wlf
+simulation/questa/modelsim.ini
+simulation/questa/rtl_work/
+simulation/questa/work/

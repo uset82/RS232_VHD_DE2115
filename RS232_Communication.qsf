@@ -26,14 +26,10 @@ set_global_assignment -name VHDL_FILE src/rs232_top.vhd
 set_global_assignment -name VHDL_FILE src/sender.vhd
 set_global_assignment -name VHDL_FILE src/mottaker.vhd
 set_global_assignment -name VHDL_FILE src/baud_rate_selector.vhd
-set_global_assignment -name VHDL_FILE src/digital_clock.vhd
-set_global_assignment -name VHDL_FILE src/enable_1hz.vhd
 set_global_assignment -name VHDL_FILE src/data_source_mux.vhd
 set_global_assignment -name VHDL_FILE src/data_display.vhd
 set_global_assignment -name VHDL_FILE src/reset_sync.vhd
-set_global_assignment -name VHDL_FILE src/message_sync.vhd
 set_global_assignment -name VHDL_FILE src/bin2bcd_8bit.vhd
-set_global_assignment -name VHDL_FILE src/bin2bcd.vhd
 set_global_assignment -name VHDL_FILE src/ROM_7_seg.vhd
 
 # Timing Constraints
