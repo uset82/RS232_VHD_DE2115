@@ -1,0 +1,86 @@
+transcript on
+cd C:/Quartus_ELE111/RS232_CCM/sim/loopback
+# reading modelsim.ini
+vsim -do run.do
+# No design specified
+if {[file exists work]} {
+    vdel -lib work -all
+}
+vlib work
+vmap work work
+# Model Technology ModelSim - Intel FPGA Edition vmap 2020.1 Lib Mapping Utility 2020.02 Feb 28 2020
+# vmap work work 
+# Modifying modelsim.ini
+
+vcom ../../src/sender.vhd
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 19:13:44 on Nov 16,2025
+# vcom -reportprogress 300 ../../src/sender.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity sender
+# -- Compiling architecture RTL of sender
+# End time: 19:13:44 on Nov 16,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+vcom ../../src/mottaker.vhd
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 19:13:44 on Nov 16,2025
+# vcom -reportprogress 300 ../../src/mottaker.vhd 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity mottaker
+# -- Compiling architecture RTL of mottaker
+# End time: 19:13:45 on Nov 16,2025, Elapsed time: 0:00:01
+# Errors: 0, Warnings: 0
+vcom tb_loopback.vht
+# Model Technology ModelSim - Intel FPGA Edition vcom 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 19:13:45 on Nov 16,2025
+# vcom -reportprogress 300 tb_loopback.vht 
+# -- Loading package STANDARD
+# -- Loading package TEXTIO
+# -- Loading package std_logic_1164
+# -- Loading package NUMERIC_STD
+# -- Compiling entity tb_loopback
+# -- Compiling architecture sim of tb_loopback
+# End time: 19:13:45 on Nov 16,2025, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+
+vsim work.tb_loopback -voptargs=+acc
+# vsim work.tb_loopback -voptargs="+acc" 
+# Start time: 19:13:45 on Nov 16,2025
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading ieee.numeric_std(body)
+# Loading work.tb_loopback(sim)
+# Loading work.sender(rtl)
+# Loading work.mottaker(rtl)
+if {[catch {wave delete -all}]} {
+    # Ignore if the wave window is already empty
+}
+add wave -radix hex    sim:/tb_loopback/tx_dataIn
+add wave               sim:/tb_loopback/txReady
+add wave               sim:/tb_loopback/serial_line
+add wave -radix hex    sim:/tb_loopback/rx_dataOut
+add wave               sim:/tb_loopback/rx_dataValid
+add wave               sim:/tb_loopback/rx_error
+add wave -radix unsigned sim:/tb_loopback/baud_rate_divider
+add wave               sim:/tb_loopback/bytes_sent
+add wave               sim:/tb_loopback/bytes_received
+run 500 us
+# ** Note: Testing baud rate divider: 50
+#    Time: 200 ns  Iteration: 0  Instance: /tb_loopback
+wave zoomrange 0us 120us
+# {0 ps} {120 us}
+
+# Can't move the Now cursor.
+   run 500 us
+   stop
+   wave zoomrange 0us 120us
+# {0 ps} {120 us}
+# End time: 19:56:54 on Nov 17,2025, Elapsed time: 24:43:09
+# Errors: 0, Warnings: 0
