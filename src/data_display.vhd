@@ -16,7 +16,8 @@ entity data_display is
         led_error   : out std_logic;
         -- 7-segment outputs
         hex0        : out std_logic_vector(6 downto 0);
-        hex1        : out std_logic_vector(6 downto 0)
+        hex1        : out std_logic_vector(6 downto 0);
+        hex2        : out std_logic_vector(6 downto 0)
     );
 end entity data_display;
 
@@ -40,6 +41,7 @@ architecture RTL of data_display is
     signal data_latched : std_logic_vector(7 downto 0);
     signal bcd_data     : std_logic_vector(11 downto 0);
     signal valid_pulse_counter : integer range 0 to 500000;  -- 10ms pulse
+    signal hex2_raw     : std_logic_vector(6 downto 0);
     
 begin
     -- LED outputs
@@ -97,5 +99,22 @@ begin
             adresse => bcd_data(7 downto 4),
             HEX     => hex1
         );
+
+    -- 7-segment display for hundreds digit
+    rom_7seg_hundreds : ROM_7_seg
+        port map(
+            adresse => bcd_data(11 downto 8),
+            HEX     => hex2_raw
+        );
+
+    -- Hide hundreds digit when zero to avoid leading zero for values < 100
+    process(bcd_data, hex2_raw)
+    begin
+        if bcd_data(11 downto 8) = "0000" then
+            hex2 <= "1111111";
+        else
+            hex2 <= hex2_raw;
+        end if;
+    end process;
     
 end architecture RTL;

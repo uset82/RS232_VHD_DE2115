@@ -22,3 +22,4 @@ add wave -radix unsigned sim:/tb_loopback/baud_rate_divider
 add wave               sim:/tb_loopback/bytes_sent
 add wave               sim:/tb_loopback/bytes_received
 run 500 us
+wave zoomrange 0us 120us

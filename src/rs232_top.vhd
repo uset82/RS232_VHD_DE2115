@@ -71,7 +71,8 @@ architecture RTL of rs232_top is
             led_valid   : out std_logic;
             led_error   : out std_logic;
             hex0        : out std_logic_vector(6 downto 0);
-            hex1        : out std_logic_vector(6 downto 0)
+            hex1        : out std_logic_vector(6 downto 0);
+            hex2        : out std_logic_vector(6 downto 0)
         );
     end component;
 
@@ -207,7 +208,8 @@ begin
             led_valid   => LEDG(0),
             led_error   => LEDG(1),
             hex0        => HEX0,
-            hex1        => HEX1
+            hex1        => HEX1,
+            hex2        => HEX2
         );
 
     --------------------------------------------------------------------
@@ -246,6 +248,7 @@ begin
             adresse => rx_data_hex_lo,
             HEX     => HEX4_rom
         );
+
     
     -- I/O configuration based on mode
     -- Always drive TX and sample RX (supports loopback and two-board setups)
@@ -266,9 +269,12 @@ begin
     HEX5 <= HEX5_rom when mode_select = '1' else "1111111";
     HEX4 <= HEX4_rom when mode_select = '1' else "1111111";
 
-    -- Keep HEX3 and HEX2 blank for now
-    HEX3 <= "1111111";
-    HEX2 <= "1111111";
+    -- Show baud-rate selection on HEX3 (0..7)
+    rom_baud_sel : ROM_7_seg
+        port map(
+            adresse => '0' & SW(16 downto 14),
+            HEX     => HEX3
+        );
     
     -- Unused outputs
     LEDR(17 downto 8) <= (others => '0');
