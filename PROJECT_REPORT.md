@@ -10,7 +10,8 @@
 4. [Test – Verification](#4-test--verification)
 5. [Test with SignalTAP](#5-test-with-signaltap)
 6. [Discussion / Conclusion](#6-discussion--conclusion)
-7. [Appendix: VHDL Code](#appendix-vhdl-code)
+7. [References / Acknowledgments](#7-references--acknowledgments)
+8. [Appendix: VHDL Code](#appendix-vhdl-code)
 
 ---
 
@@ -21,7 +22,7 @@ This project implements a complete RS-232 communication system on the DE2-115 FP
 The system meets all the requirements of the project assignment: a stable baud rate generator, robust TX/RX state machines, proper synchronization, and a documented test plan.
 
 **Conclusion Summary:**
-The design functions according to the specifications. The implementation successfully demonstrates asynchronous serial communication, with verified timing and data integrity. 
+The design functions according to the specifications. The implementation successfully demonstrates asynchronous serial communication, with verified timing and data integrity.
 
 ## 2. Problem Analysis
 
@@ -33,24 +34,25 @@ The goal is to create a system capable of sending and receiving 8-bit RS-232 fra
 
 The system design requires the implementation of several key functional modules to ensure reliable communication and user interaction. The main challenges and their corresponding solutions are outlined below:
 
-*   **Baud Rate Generation**:
-    *   A precise frequency divider is needed to convert the 50 MHz system clock into standard RS-232 baud rates.
-    *   The generator must provide timing pulses for the transmitter (at the start of a bit period) and the receiver (at the middle of a bit period) to ensure accurate data sampling.
+* **Baud Rate Generation**:
 
-*   **Finite State Machines (FSM)**:
-    *   **Transmitter (TX)**: A state machine is required to control the serialization process, transitioning through `IDLE`, `START`, `DATA`, and `STOP` states.
-    *   **Receiver (RX)**: A separate state machine must handle deserialization, detecting the start bit, shifting in data bits, and validating the stop bit while checking for framing errors.
+  * A precise frequency divider is needed to convert the 50 MHz system clock into standard RS-232 baud rates.
+  * The generator must provide timing pulses for the transmitter (at the start of a bit period) and the receiver (at the middle of a bit period) to ensure accurate data sampling.
+* **Finite State Machines (FSM)**:
 
-*   **Data Path and User Interface**:
-    *   **Input**: A multiplexer is needed to select between a fixed test pattern (0xA5) and user-defined data from switches (`SW[7:0]`).
-    *   **Output**: Received data must be latched and converted from binary to Binary-Coded Decimal (BCD) for visualization on 7-segment displays. LED indicators will provide real-time status feedback.
+  * **Transmitter (TX)**: A state machine is required to control the serialization process, transitioning through `IDLE`, `START`, `DATA`, and `STOP` states.
+  * **Receiver (RX)**: A separate state machine must handle deserialization, detecting the start bit, shifting in data bits, and validating the stop bit while checking for framing errors.
+* **Data Path and User Interface**:
 
-*   **Synchronization and Signal Integrity**:
-    *   **Input Synchronization**: Asynchronous inputs, such as the `rx_data_in` serial line and the `KEY3` start button, require synchronization (e.g., using multi-stage flip-flops) to prevent metastability and ensure reliable edge detection.
-    *   **Reset**: A global synchronized reset strategy is necessary to initialize the system to a known state.
+  * **Input**: A multiplexer is needed to select between a fixed test pattern (0xA5) and user-defined data from switches (`SW[7:0]`).
+  * **Output**: Received data must be latched and converted from binary to Binary-Coded Decimal (BCD) for visualization on 7-segment displays. LED indicators will provide real-time status feedback.
+* **Synchronization and Signal Integrity**:
 
-*   **Verification Strategy**:
-    *   The design must be validated through a combination of simulation (ModelSim) for logic verification and hardware testing (SignalTap, Loopback) to confirm timing and physical layer performance.
+  * **Input Synchronization**: Asynchronous inputs, such as the `rx_data_in` serial line and the `KEY3` start button, require synchronization (e.g., using multi-stage flip-flops) to prevent metastability and ensure reliable edge detection.
+  * **Reset**: A global synchronized reset strategy is necessary to initialize the system to a known state.
+* **Verification Strategy**:
+
+  * The design must be validated through a combination of simulation (ModelSim) for logic verification and hardware testing (SignalTap, Loopback) to confirm timing and physical layer performance.
 
 ## 3. Description of Chosen Realization
 
@@ -198,6 +200,30 @@ During development, initial issues with synchronization were solved by adding th
 * **Modular Design**: Breaking the system into smaller blocks (Sender, Receiver, Baudgen) made testing and debugging significantly easier.
 * **Simulation First**: Verifying the FSM logic in ModelSim before going to hardware saved a lot of time by catching logic errors early.
 * **SignalTap**: Learning to use SignalTap was crucial for verifying the internal timing on the FPGA, especially for the high-speed baud rates.
+
+---
+
+## 7. References / Acknowledgments
+
+### 7.1 Educational Resources
+
+This project was developed using code examples, diagrams, and educational materials provided by **Eivind Vågslid Skjæveland** during the ELE111 & [ELE113-1 25V HW/SW systemkonstruksjon](https://hvl.instructure.com/courses/28662) course lectures. The foundational architecture, state machine diagrams, and design patterns used in this implementation are based on the reference implementations offered in class.
+
+Specifically:
+
+* State machine diagrams and timing diagrams for the RS-232 transmitter and receiver
+* Baud rate generation concepts and implementation patterns
+* Synchronization techniques for asynchronous signals
+* Overall system architecture and block design approach
+
+### 7.2 Development Tools
+
+During the development and debugging process, the following tools were used to assist with code generation, error fixing, and problem-solving:
+
+* **VSCode Copilot**: Used for code suggestions, syntax completion, and error detection
+* **ChatGPT 5.1**: Utilized for debugging assistance, code explanation, and troubleshooting guidance. 
+
+These AI-assisted development tools were used in a similar manner to traditional development aids, helping to identify, understand, and resolve compilation errors, improve code structure, and understand complex VHDL concepts.
 
 ---
 

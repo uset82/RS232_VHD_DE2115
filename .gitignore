@@ -11,6 +11,8 @@ output_files/*.summary
 output_files/*.done
 output_files/*.jdi
 output_files/*.jditmp
+output_files/*.fit.smsg
+output_files/*.sld
 *.qarlog
 
 # Simulation files
