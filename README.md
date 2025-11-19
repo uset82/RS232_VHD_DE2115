@@ -2,17 +2,18 @@
 
 ## ELE111 Semester Project 2025
 
-A complete RS-232 communication system implementation on the Altera/Intel DE2-115 FPGA development board. This project demonstrates bidirectional serial communication using UART-style framing with configurable baud rates, dual data sources, and comprehensive status visualization.
+A complete RS-232 communication system implementation on the Altera/Intel DE2-115 FPGA development board. This project implements the RS-232 protocol for point-to-point serial communication between two DE2-115 boards, following the ELE111 semester assignment specifications. The system features configurable baud rates, dual data sources, and comprehensive status visualization.
 
 ---
 
 ## 📋 Overview
 
-This project implements a full-featured RS-232 communication system that can send and receive 8-bit data frames. The system includes:
+This project implements a full RS-232 communication system following the RS-232 protocol standard. RS-232 is a standard for point-to-point communication over relatively short distances at low to medium data rates. The system enables two DE2-115 boards to communicate with each other, where one board acts as a transmitter (sender) and the other as a receiver.
 
-- **Configurable Baud Rate Generator**: Supports 8 different baud rates (4,800 to 1,000,000 baud)
-- **Transmitter (TX)**: Serializes 8-bit data with proper RS-232 framing
-- **Receiver (RX)**: Deserializes incoming data with mid-bit sampling and error detection
+**Key Components:**
+- **RS-232 Transmitter (Sender)**: Implements RS-232 framing with start bit, 8 data bits, and stop bit
+- **RS-232 Receiver (Mottaker)**: Implements RS-232 reception with start bit detection, mid-bit sampling, and stop bit validation
+- **Configurable Baud Rate Generator**: Supports 8 different baud rates (4,800 to 1,000,000 baud) as specified in the assignment
 - **Dual Data Sources**: Select between hardcoded test pattern (0xA5) or user-defined data from switches
 - **Status Visualization**: Real-time feedback via LEDs and 7-segment displays
 - **Hardware Verification**: SignalTap II Logic Analyzer integration for on-chip debugging
@@ -138,12 +139,17 @@ RS232_CCM/
 
 ### 4. Physical Connections
 
-For board-to-board communication:
-- **TX → RX**: Connect EX_IO[0] (Board 1) to EX_IO[6] (Board 2)
-- **RX → TX**: Connect EX_IO[6] (Board 1) to EX_IO[0] (Board 2)
+RS-232 is designed for point-to-point communication between two devices using a two-conductor cable (twisted pair).
 
-For loopback testing (single board):
-- Connect EX_IO[0] (TX) to EX_IO[6] (RX) with a jumper wire
+**For Board-to-Board RS-232 Communication:**
+- **Transmitter (Board 1)**: Connect EX_IO[0] (TX output) to EX_IO[6] (RX input) on Board 2
+- **Receiver (Board 2)**: Connect EX_IO[6] (RX input) to EX_IO[0] (TX output) on Board 1
+- Use a twisted pair cable or jumper wire for the connection
+- **Important**: Both boards must use the same baud rate (SW[16:14] must match)
+
+**For Loopback Testing (Single Board):**
+- Connect EX_IO[0] (TX output) to EX_IO[6] (RX input) with a jumper wire
+- Set the board to sender mode (SW[17] = 0), then switch to receiver mode (SW[17] = 1) to receive the transmitted data
 
 ---
 
@@ -203,11 +209,19 @@ See `sim/README.md` for detailed instructions on each simulation.
 
 ## 🔬 Technical Details
 
-### RS-232 Frame Format
-- **Start Bit**: Logic '0' (1 bit period)
-- **Data Bits**: 8 bits, LSB first
-- **Stop Bit**: Logic '1' (1 bit period)
-- **Idle**: Line stays high ('1')
+### RS-232 Protocol and Frame Format
+
+The RS-232 protocol is a standard for serial communication between two devices (point-to-point). The line uses two conductors (twisted pair cable). The voltage level is high (Vcc) when the line is idle.
+
+**Frame Format:**
+- **Idle State**: Line is at high voltage (Vcc) when no data is being transmitted
+- **Start Bit**: Logic '0' (low voltage, 1 bit period) - always marks the beginning of a frame
+- **Data Bits**: 8 bits transmitted sequentially, LSB first
+  - Logic '1' = high voltage
+  - Logic '0' = low voltage
+- **Stop Bit**: Logic '1' (high voltage, 1 bit period) - always marks the end of a frame
+
+The system implements RS-232 without parity bits, using one stop bit, as specified in the ELE111 assignment.
 
 ### Baud Rate Selection
 | SW[16:14] | Baud Rate | Divider Value |
@@ -230,7 +244,7 @@ See `sim/README.md` for detailed instructions on each simulation.
 
 ## 👥 Credits
 
-This project was developed as part of the **ELE111** course** at HVL (Western Norway University of Applied Sciences).
+This project was developed as part of the **ELE111** course at HVL (Western Norway University of Applied Sciences).
 
 ### Educational Resources
 Code examples, diagrams, and educational materials were provided by **Eivind Vågslid Skjæveland** during the course lectures.
