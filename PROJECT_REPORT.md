@@ -229,4 +229,4 @@ These AI-assisted development tools were used in a similar manner to traditional
 
 ## Appendix: VHDL Code
 
-(Please refer to the attached `.vhd` files in the `src/` directory for the full source code.)
+VIDEO: https://www.dropbox.com/scl/fi/urg8s6a5cg4eq7t783jjv/E8D91129-ADAF-41F7-9226-0996A841F3BC.MOV?rlkey=0rcges3phi227r7d1iqfx7uh2&e=2&st=6ygc8f1l&bmus=1&dl=0 
