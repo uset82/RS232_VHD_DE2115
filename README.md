@@ -278,5 +278,5 @@ This is a course project. For questions or issues, please refer to the documenta
 
 ---
 
-**Ready to use?** Start by compiling the project in Quartus and programming your DE2-115 board. See `QUICK_REFERENCE.md` for detailed usage instructions!
+VIDEO :  https://www.dropbox.com/scl/fi/urg8s6a5cg4eq7t783jjv/E8D91129-ADAF-41F7-9226-0996A841F3BC.MOV?rlkey=0rcges3phi227r7d1iqfx7uh2&e=2&st=wrqfryi8&bmus=1&dl=0 
 
